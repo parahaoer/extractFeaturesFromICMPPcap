@@ -94,7 +94,7 @@ def getDistanceBetweenSameside(ip_pair_datas, type_code):
       print(len(icmp_packet.original))
       print(icmp_packet.original.hex())
       print(e)
-      pass
+      continue
       
     
   return distance_between_same_side_list

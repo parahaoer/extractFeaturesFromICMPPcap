@@ -41,5 +41,3 @@ def get_filelist(dir, ip_pairs_dict):
         for s in os.listdir(dir):
             newDir = os.path.join(dir, s)
             get_filelist(newDir, ip_pairs_dict)
-
-    return True if "negative-icmp" in dir else False

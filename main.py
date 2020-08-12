@@ -4,9 +4,10 @@ if __name__ == "__main__":
 
     extractFeatures = True
     if extractFeatures:
-        pcap_dir = "pcap_dir"
-        feature_file = "feature.csv"
-        extractFeaturesFromIPPairs(pcap_dir, feature_file)
+        is_negative_sample = True
+        pcap_dir = "negative-icmp"
+        feature_file = "negative_feature.csv"
+        extractFeaturesFromIPPairs(pcap_dir, feature_file, is_negative_sample)
     else:
         pass
 

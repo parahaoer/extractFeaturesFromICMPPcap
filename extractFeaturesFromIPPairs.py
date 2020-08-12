@@ -1,6 +1,8 @@
 import numpy as np
 from analyzePcap import get_filelist
 from getLevenshtein import getDistanceInICMPPair, getDistanceBetweenSameside
+from multiprocessing import Pool #多进程
+from multiprocessing import Manager, Process
 import csv
 
 def extractFeaturesFromPayloadLen(datas):
@@ -89,10 +91,67 @@ def getPercentile(payload_len_list):
     return [min, first_quantile, median, third_quantile, max, mean]
 
 
-def extractFeaturesFromIPPairs(pcap_dir, feature_file):
+def extractFeaturesWithMultithreading(ip_pair_datas, features, is_negative_sample):
+  
+    feature_from_payload_len = extractFeaturesFromPayloadLen(ip_pair_datas)
+    print(feature_from_payload_len)
+
+    distance_in_ICMP_pair_list = getDistanceInICMPPair(ip_pair_datas)
+    distance_in_ICMP_pair_percentile = getPercentile(distance_in_ICMP_pair_list)
+    # print(distance_in_ICMP_pair_list)
+    # print(len(distance_in_ICMP_pair_list))
+    # print(distance_in_ICMP_pair_percentile)
+    # print("\n")
+
+    distance_between_type_8_list = getDistanceBetweenSameside(ip_pair_datas, 8)
+    distance_between_type_8_percentile = getPercentile(distance_between_type_8_list)
+    # print(distance_between_type_8_list)
+    # print(len(distance_between_type_8_list))
+    # print(distance_between_type_8_percentile)
+    # print("\n")
+
+    distance_between_type_0_list = getDistanceBetweenSameside(ip_pair_datas, 0)
+    distance_between_type_0_percentile = getPercentile(distance_between_type_0_list)
+    # print(distance_between_type_0_list)
+    # print(len(distance_between_type_0_list))
+    # print(distance_between_type_0_percentile)
+    # print("\n")
+
+    feature_vec = feature_from_payload_len + distance_in_ICMP_pair_percentile + distance_between_type_8_percentile + distance_between_type_0_percentile
     
+    if is_negative_sample:
+        feature_vec.append(1)
+    else :
+        feature_vec.append(0)
+
+    features.append(feature_vec)
+
+
+
+
+def extractFeaturesFromIPPairs(pcap_dir, feature_file, is_negative_sample):
+
+    # extractFeaturesFromIPPairs 函数中修改全局变量（如ip_pairs_dict等），这些修改在extractFeaturesWithMultithreading函数无效，可能是因为它们在不同的进程。
+    POOL_SIZE = 2
+
+    manager = Manager()
+    ip_pair_datas = manager.list()
+    features = manager.list()
+    is_negative_sample_para = manager.Value('is_negative_sample', is_negative_sample)
+
+    ip_pairs_dict = {}
+    get_filelist(pcap_dir, ip_pairs_dict)
+
+    ip_keys = list(ip_pairs_dict.keys())
+
+    for ip_key in ip_keys:
+        ip_pair_datas = ip_pairs_dict.get(ip_key)     
+        p = Process(target=extractFeaturesWithMultithreading, args=(ip_pair_datas, features, is_negative_sample_para))
+        p.start()
+        p.join()
+
     # 1. 创建文件对象
-    f = open(feature_file,'w',encoding='utf-8', newline='')
+    f = open(feature_file,'a',encoding='utf-8', newline='')
 
     # 2. 基于文件对象构建 csv写入对象
     csv_writer = csv.writer(f)
@@ -110,47 +169,10 @@ def extractFeaturesFromIPPairs(pcap_dir, feature_file):
             header_list.append(header)
     
     header_list.append("label")
-
     csv_writer.writerow(header_list)
 
-    ip_pairs_dict = {}
-
-    is_negative_sample =  get_filelist(pcap_dir, ip_pairs_dict)
-
-    for key in ip_pairs_dict.keys():
-        
-        ip_pair_datas = ip_pairs_dict.get(key)     
-        feature_from_payload_len = extractFeaturesFromPayloadLen(ip_pair_datas)
-        print(feature_from_payload_len)
-
-        distance_in_ICMP_pair_list = getDistanceInICMPPair(ip_pair_datas)
-        distance_in_ICMP_pair_percentile = getPercentile(distance_in_ICMP_pair_list)
-        # print(distance_in_ICMP_pair_list)
-        # print(len(distance_in_ICMP_pair_list))
-        # print(distance_in_ICMP_pair_percentile)
-        # print("\n")
-
-        distance_between_type_8_list = getDistanceBetweenSameside(ip_pair_datas, 8)
-        distance_between_type_8_percentile = getPercentile(distance_between_type_8_list)
-        # print(distance_between_type_8_list)
-        # print(len(distance_between_type_8_list))
-        # print(distance_between_type_8_percentile)
-        # print("\n")
-
-        distance_between_type_0_list = getDistanceBetweenSameside(ip_pair_datas, 0)
-        distance_between_type_0_percentile = getPercentile(distance_between_type_0_list)
-        # print(distance_between_type_0_list)
-        # print(len(distance_between_type_0_list))
-        # print(distance_between_type_0_percentile)
-        # print("\n")
-
-        feature_list = feature_from_payload_len + distance_in_ICMP_pair_percentile + distance_between_type_8_percentile + distance_between_type_0_percentile
-        if is_negative_sample:
-            feature_list.append(1)
-        else :
-            feature_list.append(0)
-        print(feature_list)
-        csv_writer.writerow(feature_list)
+    for feature_vec in features:
+        csv_writer.writerow(feature_vec)
     f.close()
 
     
