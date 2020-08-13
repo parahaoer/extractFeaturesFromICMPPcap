@@ -92,7 +92,8 @@ def getPercentile(payload_len_list):
 
 
 def extractFeaturesWithMultithreading(ip_pair_datas, features, is_negative_sample):
-  
+    
+    # print(is_negative_sample)  # Value('is_negative_sample', False)
     feature_from_payload_len = extractFeaturesFromPayloadLen(ip_pair_datas)
     print(feature_from_payload_len)
 
@@ -119,7 +120,7 @@ def extractFeaturesWithMultithreading(ip_pair_datas, features, is_negative_sampl
 
     feature_vec = feature_from_payload_len + distance_in_ICMP_pair_percentile + distance_between_type_8_percentile + distance_between_type_0_percentile
     
-    if is_negative_sample:
+    if is_negative_sample.Value:
         feature_vec.append(1)
     else :
         feature_vec.append(0)
@@ -132,7 +133,7 @@ def extractFeaturesWithMultithreading(ip_pair_datas, features, is_negative_sampl
 def extractFeaturesFromIPPairs(pcap_dir, feature_file, is_negative_sample):
 
     # extractFeaturesFromIPPairs 函数中修改全局变量（如ip_pairs_dict等），这些修改在extractFeaturesWithMultithreading函数无效，可能是因为它们在不同的进程。
-    POOL_SIZE = 2
+    pool = Pool(10)
 
     manager = Manager()
     ip_pair_datas = manager.list()
@@ -145,10 +146,14 @@ def extractFeaturesFromIPPairs(pcap_dir, feature_file, is_negative_sample):
     ip_keys = list(ip_pairs_dict.keys())
 
     for ip_key in ip_keys:
-        ip_pair_datas = ip_pairs_dict.get(ip_key)     
-        p = Process(target=extractFeaturesWithMultithreading, args=(ip_pair_datas, features, is_negative_sample_para))
-        p.start()
-        p.join()
+        ip_pair_datas = ip_pairs_dict.get(ip_key)  
+        # 异步方式添加到进程池内
+        pool.apply_async(extractFeaturesWithMultithreading, (ip_pair_datas, features, is_negative_sample_para))   
+
+    # 关闭进程池(停止添加，已添加的还可运行)
+    pool.close()
+    # 让主进程阻塞，等待子进程结束
+    pool.join()
 
     # 1. 创建文件对象
     f = open(feature_file,'a',encoding='utf-8', newline='')

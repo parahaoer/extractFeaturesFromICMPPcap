@@ -1,13 +1,13 @@
 
-def getIPPairs(data, ip_pairs_dict):
+def getIPPairs(data, ip_pairs_dict, shortname):
 
     if(is_icmp(data)):
         ip_packet = data.payload
         src_ip = ip_packet.fields['src']
         dst_ip = ip_packet.fields['dst']
 
-        key1 = (src_ip, dst_ip)
-        key2 = (dst_ip, src_ip)
+        key1 = (shortname + src_ip, shortname + dst_ip)
+        key2 = (shortname + dst_ip, shortname + src_ip)
 
         if key1 not in ip_pairs_dict.keys() and key2 not in ip_pairs_dict.keys():
             ip_pairs_dict[key1] = []

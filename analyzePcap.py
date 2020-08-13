@@ -2,8 +2,16 @@ from scapy.all import *
 from getIPPairs import getIPPairs
 import re
 
+
+def jwkj_get_filePath_fileName_fileExt(filename):
+    (filepath,tempfilename) = os.path.split(filename)
+    (shortname,extension) = os.path.splitext(tempfilename)
+    #filepath是文件所在的目录（最后没有 /），shotname是去除最后一个. 所得到的文件名
+    return filepath,shortname,extension
+
 def analyzePcap(filepath, ip_pairs_dict):
     
+    _, shortname, _ = jwkj_get_filePath_fileName_fileExt(filepath)
     print('filepath:' + filepath)
     s1 = PcapReader(filepath)
 
@@ -15,7 +23,7 @@ def analyzePcap(filepath, ip_pairs_dict):
     
         while data is not None:
 
-            getIPPairs(data, ip_pairs_dict)
+            getIPPairs(data, ip_pairs_dict, shortname)
             
             data = s1.read_packet() 
 
