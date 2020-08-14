@@ -3,7 +3,7 @@ from Classifier import classifier
 
 if __name__ == "__main__":
 
-    extractFeatures = True
+    extractFeatures = False
     if extractFeatures:
         is_negative_sample = False
         pcap_dir = "pcap_dir/positive-icmp"

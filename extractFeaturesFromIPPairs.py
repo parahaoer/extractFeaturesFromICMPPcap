@@ -120,11 +120,10 @@ def extractFeaturesWithMultithreading(ip_pair_datas, features, is_negative_sampl
 
     feature_vec = feature_from_payload_len + distance_in_ICMP_pair_percentile + distance_between_type_8_percentile + distance_between_type_0_percentile
     
-    if is_negative_sample.Value:
+    if is_negative_sample.value:
         feature_vec.append(1)
     else :
         feature_vec.append(0)
-
     features.append(feature_vec)
 
 
@@ -136,7 +135,7 @@ def extractFeaturesFromIPPairs(pcap_dir, feature_file, is_negative_sample):
     pool = Pool(10)
 
     manager = Manager()
-    ip_pair_datas = manager.list()
+    ip_pair_datas = manager.list() # 主进程与子进程共享该列表
     features = manager.list()
     is_negative_sample_para = manager.Value('is_negative_sample', is_negative_sample)
 

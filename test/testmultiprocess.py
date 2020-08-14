@@ -1,7 +1,7 @@
 import multiprocessing
 
 def f(x, arr, l):
-    x.value = False
+    print(x.value)
     arr[0] = 5
     l.append('Hello')
 
@@ -15,7 +15,7 @@ if __name__ == '__main__':
         proc.start()
         proc.join()
 
-        print(x.value)
+        # print(x.value)
         print(arr)
         print(l)
 
