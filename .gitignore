@@ -5,3 +5,11 @@ __pycache__/getIPPairs.cpython-37.pyc
 __pycache__/getLevenshtein.cpython-37.pyc
 __pycache__/Levenshtein.cpython-37.pyc
 __pycache__/Classifier.cpython-37.pyc
+__pycache__/FeatureExtractor.cpython-37.pyc
+__pycache__/ICMPPairsGenerator.cpython-37.pyc
+__pycache__/IPPairsGenerator.cpython-37.pyc
+__pycache__/LevenshteinDistanceCalculator.cpython-37.pyc
+__pycache__/PcapAnalyzer.cpython-37.pyc
+images/classification/plot_precision_vs_recall.png
+images/classification/precision_recall_vs_threshold_plot.png
+images/classification/plot_precision_vs_recall.png

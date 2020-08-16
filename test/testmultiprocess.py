@@ -1,24 +1,32 @@
 import multiprocessing
 
-def f(x, arr, l):
+
+def f(x, arr, l, dict1):
     print(x.value)
     arr[0] = 5
+    print('arr[1]=' + str(arr[1]))
     l.append('Hello')
+    print(l)
+    print(dict1)
+
 
 if __name__ == '__main__':
-        manager = multiprocessing.Manager() 
-        x    = manager.Value('d', True)
-        arr  = manager.Array('i', range(10))
-        l    = manager.list()
+    manager = multiprocessing.Manager()
+    x = manager.Value('d', True)
+    arr = manager.Array('i', range(10))
+    l = manager.list()
+    l.append(["a", "b", "c"])
+    dict1 = manager.dict()
+    dict1 = {"a": 1, "b": 2}
+    x.value = False
+    arr[1] = 10
+    proc = multiprocessing.Process(target=f, args=(x, arr, l, dict1))
+    proc.start()
+    proc.join()
 
-        proc = multiprocessing.Process(target=f, args=(x, arr, l))
-        proc.start()
-        proc.join()
-
-        # print(x.value)
-        print(arr)
-        print(l)
-
+    print(x.value)
+    print(arr)
+    print(l)
 
 # from multiprocessing import Process, Manager
 
