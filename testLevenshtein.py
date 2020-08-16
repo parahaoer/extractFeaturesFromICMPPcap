@@ -1,19 +1,10 @@
-from getLevenshtein import normal_leven
+from LevenshteinDistanceCalculator import LevenshteinDistanceCalculator
 
-byte_str1 = b'\x08\x00\x0e\xf9,\xe0\x05k\x10\x01"\x0f\x01\x00\x00\x00\x0e\xd6\xac\xa4~\x13\xac\xef\xdc\x01\xe00\xda\xfa\x06'
-byte_str2 = b'\x00\x00\x15\xd1,\xe0\x05k\x10\x01"\x0f\x01\x00\x00\x00\x0e\xd6\xac\xa4~\x13\xac\xef\xdc\x01\xe0(\x010\xda\xfa\x06'
+levenshteinDistanceCalculator =  LevenshteinDistanceCalculator()
 
-for b in byte_str1:
-    print(str(b) + " ", end="")
+res = levenshteinDistanceCalculator.normal_leven("abc", "abc")
 
-print("\n")
-
-for b in byte_str2:
-    print(str(b) + " ", end="")
-
-print("\n")
-
-print(normal_leven(byte_str1, byte_str2))   # ==> 5
+print(res)
 
 
 

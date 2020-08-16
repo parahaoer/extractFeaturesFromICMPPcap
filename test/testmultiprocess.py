@@ -10,12 +10,12 @@ if __name__ == '__main__':
         x    = manager.Value('d', True)
         arr  = manager.Array('i', range(10))
         l    = manager.list()
-
+        x.value = False
         proc = multiprocessing.Process(target=f, args=(x, arr, l))
         proc.start()
         proc.join()
 
-        # print(x.value)
+        print(x.value)
         print(arr)
         print(l)
 
