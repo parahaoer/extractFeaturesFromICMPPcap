@@ -29,7 +29,6 @@ class FeatureExtractor():
         src_ip_packet_list = []
 
         for data in datas:
-
             ip_packet = data.payload
             icmp_packet = ip_packet.payload
 
@@ -86,12 +85,10 @@ class FeatureExtractor():
         return len(icmp_payload.original)
 
     def extractPayloadLenFeature(self, datas):
-
         icmp_payload_len_list = []
         for data in datas:
             icmp_payload_len = self.getICMPPayloadLen(data)
             icmp_payload_len_list.append(icmp_payload_len)
-
         return icmp_payload_len_list
 
     def getPercentile(self, payload_len_list):
@@ -108,7 +105,6 @@ class FeatureExtractor():
         return [min, first_quantile, median, third_quantile, max, mean]
 
     def extractFeaturesWithMultiprocess(self, ip_pair_datas, features, is_negative_sample):
-
         levenshteinDistanceCalculator = LevenshteinDistanceCalculator()
 
         # print(is_negative_sample)  # Value('is_negative_sample', False)
@@ -219,7 +215,6 @@ class FeatureExtractor():
                 else:
                     header = item1 + '_' + item2
                 header_list.append(header)
-
         header_list.append("label")
         csv_writer.writerow(header_list)
 
