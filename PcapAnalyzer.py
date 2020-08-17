@@ -34,7 +34,7 @@ class PcapAnalyzer():
             print(No)
             print(ex)
             pass
-
+        
     def get_filelist(self, dir):
 
         if os.path.isfile(dir):
