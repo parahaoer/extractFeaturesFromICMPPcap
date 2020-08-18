@@ -12,6 +12,7 @@ from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 import os
+from sklearn.tree import export_graphviz
 
 # Where to save the figures
 PROJECT_ROOT_DIR = "."
@@ -59,12 +60,20 @@ def classifier(feature_csv_file):
     train_set = features
     train_features = train_set.drop("label", axis=1)
     train_labels = train_set["label"].copy()
-    scaler = StandardScaler()
-    train_features_scaled = scaler.fit_transform(
-        train_features.astype(np.float64))
-    train_features = train_features_scaled
-    clf = tree.DecisionTreeClassifier()
+    # scaler = StandardScaler()
+    # train_features_scaled = scaler.fit_transform(
+    #     train_features.astype(np.float64))
+    # train_features = train_features_scaled
+    clf = tree.DecisionTreeClassifier(criterion='entropy')
     clf = clf.fit(train_features, train_labels)
+
+    export_graphviz(clf,
+                    out_file=os.path.join(IMAGES_PATH, "iris_tree.dot"),
+                    feature_names=features.columns[:-1],
+                    class_names=["NoICMPTunnel", "hasICMPTunnel"],
+                    rounded=True,
+                    filled=True)
+
     y_train_pred = cross_val_predict(clf, train_features, train_labels, cv=10)
     print("pred=" + str(y_train_pred))
     matrix = confusion_matrix(train_labels, y_train_pred)
@@ -89,7 +98,8 @@ def classifier(feature_csv_file):
     # y_scores = cross_val_predict(clf, train_features, train_labels, cv=10,method="decision_function")
     precisions, recalls, thresholds = precision_recall_curve(
         train_labels, y_scores_tree)
-    print(precisions, recalls, thresholds)
+    print('precisions:' + str(precisions), 'recalls:' + str(recalls),
+          'thresholds:' + str(thresholds))
 
     threshold_90_precision = thresholds[np.argmax(precisions >= 0.90)]
     y_train_pred_90 = (y_scores_tree >= threshold_90_precision)
@@ -123,4 +133,3 @@ def classifier(feature_csv_file):
     plt.plot([0], [0.757218], 'ro')
     save_fig("plot_roc_curve")
     plt.show()
-
