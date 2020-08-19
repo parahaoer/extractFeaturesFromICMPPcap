@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn import tree
-from sklearn.preprocessing import StandardScaler
+# from sklearn.preprocessing import StandardScaler
 # from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import confusion_matrix
@@ -110,17 +110,17 @@ def classifier(feature_csv_file):
     print('recall_score_90=' + str(recall_score_90))
 
     plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
-    plt.plot([0.673364, 0.673364], [0, 0.83822], 'r:')
-    plt.plot([0, 0.673364], [0.83822, 0.83822], 'r:')
-    plt.plot([0.673364], [0.83822], 'ro')
+    # plt.plot([0.673364, 0.673364], [0, 0.83822], 'r:')
+    # plt.plot([0, 0.673364], [0.83822, 0.83822], 'r:')
+    # plt.plot([0.673364], [0.83822], 'ro')
     save_fig("precision_recall_vs_threshold_plot")
     plt.show()
 
     plt.figure(figsize=(8, 6))
     plot_precision_vs_recall(precisions, recalls)
-    plt.plot([0.748487, 0.748487], [0, 1], 'r:')
-    plt.plot([0, 0.748487], [1, 1], 'r:')
-    plt.plot([0.748487], [1], 'ro')
+    # plt.plot([0.748487, 0.748487], [0, 1], 'r:')
+    # plt.plot([0, 0.748487], [1, 1], 'r:')
+    # plt.plot([0.748487], [1], 'ro')
     save_fig("plot_precision_vs_recall")
     plt.show()
 
@@ -128,8 +128,8 @@ def classifier(feature_csv_file):
     roc_auc = roc_auc_score(train_labels, y_scores_tree)
     print("roc_auc: " + str(roc_auc))
     plot_roc_curve(fpr, tpr)
-    plt.plot([0, 0], [0, 0.757218], 'r:')
-    plt.plot([0, 0], [0.757218, 0.757218], 'r:')
-    plt.plot([0], [0.757218], 'ro')
+    # plt.plot([0, 0], [0, 0.757218], 'r:')
+    # plt.plot([0, 0], [0.757218, 0.757218], 'r:')
+    # plt.plot([0], [0.757218], 'ro')
     save_fig("plot_roc_curve")
     plt.show()

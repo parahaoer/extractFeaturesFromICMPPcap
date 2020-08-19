@@ -3,7 +3,7 @@ from Classifier import classifier
 
 if __name__ == "__main__":
 
-    extractFeatures = True
+    extractFeatures = False
     if extractFeatures:
 
         featureExtractor = FeatureExtractor()

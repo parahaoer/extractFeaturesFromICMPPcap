@@ -51,12 +51,12 @@ class LevenshteinDistanceCalculator():
                     if has_icmp_request:  # 初始化distance不添加到列表中
                         distance_in_ICMP_pair_list.append(
                             distance_in_ICMP_pair)
-                    request_icmp_payload = str(icmp_packet.payload.original)
+                    request_icmp_payload = icmp_packet.payload.original
                     has_icmp_request = True
                     distance_in_ICMP_pair = 0
 
                 elif has_icmp_request and icmp_type == 0:
-                    reply_icmp_payload = str(icmp_packet.payload.original)
+                    reply_icmp_payload = icmp_packet.payload.original
 
                 if request_icmp_payload != b'' and reply_icmp_payload != b'':
                     distance_in_ICMP_pair += self.normal_leven(
@@ -85,7 +85,7 @@ class LevenshteinDistanceCalculator():
                 if icmp_type == type_code:
 
                     prev = packet_payload
-                    packet_payload = str(icmp_packet.payload.original)
+                    packet_payload = icmp_packet.payload.original
 
                     if prev != b'' and packet_payload != b'':
 
