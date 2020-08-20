@@ -104,14 +104,9 @@ class FeatureExtractor():
 
         return [min, first_quantile, median, third_quantile, max, mean]
 
-    def extractFeaturesWithMultiprocess(self, ip_pair_datas, features, is_negative_sample):
-        levenshteinDistanceCalculator = LevenshteinDistanceCalculator()
+    def extractDistanceFeature(self, ip_pair_datas):
 
-        # print(is_negative_sample)  # Value('is_negative_sample', False)
-        # print(is_negative_sample.value)
-        feature_from_payload_len = self.extractFeaturesFromPayloadLen(
-            ip_pair_datas)
-        # print(feature_from_payload_len)
+        levenshteinDistanceCalculator = LevenshteinDistanceCalculator()
 
         distance_in_ICMP_pair_list = levenshteinDistanceCalculator.getDistanceInICMPPair(
             ip_pair_datas)
@@ -139,8 +134,20 @@ class FeatureExtractor():
         # print(len(distance_between_type_0_list))
         # print(distance_between_type_0_percentile)
         # print("\n")
+        return distance_in_ICMP_pair_percentile + distance_between_type_8_percentile + distance_between_type_0_percentile
 
-        feature_vec = feature_from_payload_len + distance_in_ICMP_pair_percentile + distance_between_type_8_percentile + distance_between_type_0_percentile
+    def extractFeaturesWithMultiprocess(self, ip_pair_datas, features,
+                                        is_negative_sample):
+
+        # print(is_negative_sample)  # Value('is_negative_sample', False)
+        # print(is_negative_sample.value)
+        feature_from_payload_len = self.extractFeaturesFromPayloadLen(
+            ip_pair_datas)
+        # print(feature_from_payload_len)
+
+        feature_from_distance = self.extractDistanceFeature(ip_pair_datas)
+
+        feature_vec = feature_from_payload_len + feature_from_distance
 
         if is_negative_sample is True:
             feature_vec.append(1)
@@ -154,9 +161,10 @@ class FeatureExtractor():
         pool = Pool(10)
 
         manager = Manager()
-         
-        features = manager.list()  # 主进程与子进程共享该列表， features列表用来保存extractFeaturesWithMultiprocess提取的特征，然后主进程将其写入到csv文件中
-        
+
+        features = manager.list(
+        )  # 主进程与子进程共享该列表， features列表用来保存extractFeaturesWithMultiprocess提取的特征，然后主进程将其写入到csv文件中
+
         is_negative_sample = False
         ip_pairs_dict = {}
         pcapAnalyzer = PcapAnalyzer(ip_pairs_dict)
@@ -165,14 +173,15 @@ class FeatureExtractor():
 
         for ip_key in ip_pairs_dict.keys():
 
-            if(ip_key[0].find('negative') == 0):
+            if (ip_key[0].find('negative') == 0):
                 is_negative_sample = True
-            elif(ip_key[0].find('positive') == 0):
+            elif (ip_key[0].find('positive') == 0):
                 is_negative_sample = False
 
-            ip_pair_datas = ip_pairs_dict.get(ip_key)  
+            ip_pair_datas = ip_pairs_dict.get(ip_key)
             # 异步方式添加到进程池内
-            pool.apply_async(self.extractFeaturesWithMultiprocess, (ip_pair_datas, features, is_negative_sample))  
+            pool.apply_async(self.extractFeaturesWithMultiprocess,
+                             (ip_pair_datas, features, is_negative_sample))
 
         # 关闭进程池(停止添加，已添加的还可运行)
         pool.close()
@@ -195,7 +204,14 @@ class FeatureExtractor():
 
         # 2. 基于文件对象构建 csv写入对象
         csv_writer = csv.writer(f)
+        header_list = self.create_csv_header()
+        csv_writer.writerow(header_list)
 
+        for feature_vec in features:
+            csv_writer.writerow(feature_vec)
+        f.close()
+
+    def create_csv_header(self):
         # 3. 构建列表头
         header_list = [
             "type_0_packet_per_IPPair", "type_3_packet_per_IPPair",
@@ -216,8 +232,5 @@ class FeatureExtractor():
                     header = item1 + '_' + item2
                 header_list.append(header)
         header_list.append("label")
-        csv_writer.writerow(header_list)
 
-        for feature_vec in features:
-            csv_writer.writerow(feature_vec)
-        f.close()
+        return header_list
