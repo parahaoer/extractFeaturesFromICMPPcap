@@ -11,9 +11,9 @@ import csv
 
 
 class FeatureExtractor():
-    def __init__(self):
-        self.output_feature_file = 'feature.csv'
-        self.pcap_dir = 'pcap_dir'
+    def __init__(self, pcap_dir, output_feature_file):
+        self.output_feature_file = output_feature_file
+        self.pcap_dir = pcap_dir
 
     def extractFeaturesFromPayloadLen(self, datas):
         packets_amount = len(datas)

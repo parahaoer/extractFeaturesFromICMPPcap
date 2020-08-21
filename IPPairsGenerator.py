@@ -15,9 +15,9 @@ class IPPairsGenerator():
     def getNegativeFlag(self, file_path):
         file_path, shortname, _ = self.jwkj_get_filePath_fileName_fileExt(
             file_path)
-        if file_path.find('negative') == 9:
+        if 'negative' in file_path:
             return 'negative_' + shortname
-        elif file_path.find('positive') == 9:
+        elif 'positive' in file_path:
             return 'positive_' + shortname
 
     def getIPPairs(self, data, file_path):

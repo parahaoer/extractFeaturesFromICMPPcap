@@ -6,9 +6,6 @@ from FeatureExtractor import FeatureExtractor
 
 
 class FeatureExtractorWitfhDistance(FeatureExtractor):
-    def __init__(self):
-        self.output_feature_file = 'distance_feature.csv'
-        self.pcap_dir = 'pcap_dir'
 
     def extractFeaturesWithMultiprocess(self, ip_pair_datas, features,
                                         is_negative_sample):

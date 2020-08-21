@@ -97,7 +97,7 @@ class Classifier():
         y_train_pred = cross_val_predict(clf,
                                          train_features,
                                          train_labels,
-                                         cv=10)
+                                         cv=3)
         print("pred=" + str(y_train_pred))
         matrix = confusion_matrix(train_labels, y_train_pred)
         print('confusion_matrix:')
@@ -113,7 +113,7 @@ class Classifier():
         y_probas_tree = cross_val_predict(clf,
                                           train_features,
                                           train_labels,
-                                          cv=10,
+                                          cv=3,
                                           method="predict_proba")
         # print(y_probas_tree)
         y_scores = y_probas_tree[:, 1]  # score = proba of positive class
@@ -125,13 +125,13 @@ class Classifier():
         print('recalls:' + str(recalls))
         print('thresholds:' + str(thresholds))
 
-        threshold_90_precision = thresholds[np.argmax(precisions >= 0.90)]
-        y_train_pred_90 = (y_scores >= threshold_90_precision)
-        precision_score_90 = precision_score(train_labels, y_train_pred_90)
-        recall_score_90 = recall_score(train_labels, y_train_pred_90)
-        print('y_train_pred_90: ' + str(y_train_pred_90))
-        print('precision_score_90=' + str(precision_score_90))
-        print('recall_score_90=' + str(recall_score_90))
+        # threshold_90_precision = thresholds[np.argmax(precisions >= 0.0)]
+        # y_train_pred_90 = (y_scores >= threshold_90_precision)
+        # precision_score_90 = precision_score(train_labels, y_train_pred_90)
+        # recall_score_90 = recall_score(train_labels, y_train_pred_90)
+        # print('y_train_pred_90: ' + str(y_train_pred_90))
+        # print('precision_score_90=' + str(precision_score_90))
+        # print('recall_score_90=' + str(recall_score_90))
 
         self.plot_precision_recall_vs_threshold(precisions, recalls,
                                                 thresholds)
