@@ -7,7 +7,9 @@ if __name__ == "__main__":
 
     extractFeatures = False
     if extractFeatures:
-        featureExtractor = FeatureExtractor('pcap_dir/file_and_cmd_pcap', 'feature_csv_file/file_and_cmd_features.csv')
+        featureExtractor = FeatureExtractor(
+            'pcap_dir/file_and_cmd_pcap',
+            'feature_csv_file/file_and_cmd_features.csv')
         # featureExtractor = FeatureExtractorWitfhDistance('pcap_dir/file_and_cmd_pcap', 'feature_csv_file/file_and_cmd_features.csv')
         featureExtractor.extractFeaturesFromIPPairs()
 

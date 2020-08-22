@@ -98,7 +98,8 @@ class Classifier():
                                          train_features,
                                          train_labels,
                                          cv=3)
-        print("pred=" + str(y_train_pred))
+        print("label=" + str(list(train_labels)))
+        print("pred =" + str(list(y_train_pred)))
         matrix = confusion_matrix(train_labels, y_train_pred)
         print('confusion_matrix:')
         print(matrix)
