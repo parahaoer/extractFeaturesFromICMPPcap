@@ -7,11 +7,11 @@ if __name__ == "__main__":
 
     extractFeatures = False
     if extractFeatures:
-        featureExtractor = FeatureExtractor('pcap_dir/file_and_cmd_pcap', 'feature_csv_file/file_and_cmd_features.csv')
+        featureExtractor = FeatureExtractor('pcap_dir/test/icmp_tunnel_pcap', 'feature_csv_file/test_icmp_tunnel_pcap.csv')
         # featureExtractor = FeatureExtractorWitfhDistance('pcap_dir/file_and_cmd_pcap', 'feature_csv_file/file_and_cmd_features.csv')
         featureExtractor.extractFeaturesFromIPPairs()
 
     else:
         classifier = Classifier()
         # classifier = ForestClassifier()
-        classifier.classifier('feature_csv_file/file_and_cmd_features.csv')
+        classifier.classifier('feature_csv_file/test_icmp_tunnel_pcap.csv')

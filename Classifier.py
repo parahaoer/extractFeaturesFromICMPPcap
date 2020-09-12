@@ -27,11 +27,7 @@ class Classifier():
         self.IMAGES_PATH = os.path.join(PROJECT_ROOT_DIR, "images", save_path)
         os.makedirs(self.IMAGES_PATH, exist_ok=True)
 
-    def save_fig(self,
-                 fig_id,
-                 tight_layout=True,
-                 fig_extension="png",
-                 resolution=300):
+    def save_fig(self, fig_id, tight_layout=True, fig_extension="png", resolution=300):
         path = os.path.join(self.IMAGES_PATH, fig_id + "." + fig_extension)
         print("Saving figure", fig_id)
         if tight_layout:
@@ -45,8 +41,7 @@ class Classifier():
         plt.ylabel('True Positive Rate (Recall)', fontsize=16)  # Not shown
         plt.grid(True)
 
-    def plot_precision_recall_vs_threshold(self, precisions, recalls,
-                                           thresholds):
+    def plot_precision_recall_vs_threshold(self, precisions, recalls, thresholds):
         plt.plot(thresholds, precisions[:-1], "b--", label="Precision")
         plt.plot(thresholds, recalls[:-1], "g-", label="Recall")
         plt.legend(loc="lower right", fontsize=16)  # Not shown in the book
@@ -62,8 +57,7 @@ class Classifier():
 
     def classifier(self, feature_csv_file):
 
-        train_features, train_labels, features = self.getTrainSet(
-            feature_csv_file)
+        train_features, train_labels, features = self.getTrainSet(feature_csv_file)
         # scaler = StandardScaler()
         # train_features_scaled = scaler.fit_transform(
         #     train_features.astype(np.float64))
@@ -71,13 +65,7 @@ class Classifier():
         clf = tree.DecisionTreeClassifier(criterion='entropy')
         clf = clf.fit(train_features, train_labels)
 
-        export_graphviz(clf,
-                        out_file=os.path.join(self.IMAGES_PATH,
-                                              "iris_tree.dot"),
-                        feature_names=features.columns[:-1],
-                        class_names=["NoICMPTunnel", "hasICMPTunnel"],
-                        rounded=True,
-                        filled=True)
+        export_graphviz(clf, out_file=os.path.join(self.IMAGES_PATH, "icmp_tunnel_tree.dot"), feature_names=(features.columns[:-1]).drop("ip_key").drop("src_ip_amount"), class_names=[u"noICMPTunnel", u"hasICMPTunnel"], rounded=True, filled=True)
 
         self.evalClassifier(clf, train_features, train_labels)
 
@@ -85,7 +73,7 @@ class Classifier():
         features = pd.read_csv(feature_csv_file)
         # train_set, test_set = train_test_split(features, test_size=0.4,random_state=42)
         train_set = features
-        train_features = train_set.drop("label", axis=1)
+        train_features = train_set.drop(["ip_key", "src_ip_amount", "label"], axis=1)
         train_labels = train_set["label"].copy()
         # scaler = StandardScaler()
         # train_features_scaled = scaler.fit_transform(
@@ -94,11 +82,9 @@ class Classifier():
         return train_features, train_labels, features
 
     def evalClassifier(self, clf, train_features, train_labels):
-        y_train_pred = cross_val_predict(clf,
-                                         train_features,
-                                         train_labels,
-                                         cv=3)
-        print("pred=" + str(y_train_pred))
+        y_train_pred = cross_val_predict(clf, train_features, train_labels, cv=10)
+        print("pred =" + str(list(y_train_pred)))
+        print("label=" + str(list(train_labels)))
         matrix = confusion_matrix(train_labels, y_train_pred)
         print('confusion_matrix:')
         print(matrix)
@@ -110,17 +96,12 @@ class Classifier():
         print('recall=' + str(recall))
         print('f1_score=' + str(f1))
 
-        y_probas_tree = cross_val_predict(clf,
-                                          train_features,
-                                          train_labels,
-                                          cv=3,
-                                          method="predict_proba")
+        y_probas_tree = cross_val_predict(clf, train_features, train_labels, cv=10, method="predict_proba")
         # print(y_probas_tree)
         y_scores = y_probas_tree[:, 1]  # score = proba of positive class
         print('y_scores=' + str(y_scores))
         # y_scores = cross_val_predict(clf, train_features, train_labels, cv=10,method="decision_function")
-        precisions, recalls, thresholds = precision_recall_curve(
-            train_labels, y_scores)
+        precisions, recalls, thresholds = precision_recall_curve(train_labels, y_scores)
         print('precisions:' + str(precisions))
         print('recalls:' + str(recalls))
         print('thresholds:' + str(thresholds))
@@ -133,8 +114,7 @@ class Classifier():
         # print('precision_score_90=' + str(precision_score_90))
         # print('recall_score_90=' + str(recall_score_90))
 
-        self.plot_precision_recall_vs_threshold(precisions, recalls,
-                                                thresholds)
+        self.plot_precision_recall_vs_threshold(precisions, recalls, thresholds)
         # plt.plot([0.673364, 0.673364], [0, 0.83822], 'r:')
         # plt.plot([0, 0.673364], [0.83822, 0.83822], 'r:')
         # plt.plot([0.673364], [0.83822], 'ro')

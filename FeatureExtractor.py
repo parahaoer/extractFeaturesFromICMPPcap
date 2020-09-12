@@ -54,7 +54,6 @@ class FeatureExtractor():
             except KeyError as e:
                 print(ip_packet.fields['src'])
                 print(e)
-                pass
 
         type_0_packet_per_IPPair = len(type_0_packet_list) / packets_amount
         type_3_packet_per_IPPair = len(type_3_packet_list) / packets_amount
@@ -62,20 +61,13 @@ class FeatureExtractor():
         src_ip_amount = len(src_ip_packet_list)
         # print("type_3_packet_list_len=" + str(len(type_3_packet_list)))
 
-        type_0_payload_len_list = self.extractPayloadLenFeature(
-            type_0_packet_list)
-        type_8_payload_len_list = self.extractPayloadLenFeature(
-            type_8_packet_list)
+        type_0_payload_len_list = self.extractPayloadLenFeature(type_0_packet_list)
+        type_8_payload_len_list = self.extractPayloadLenFeature(type_8_packet_list)
 
-        type_0_payload_len_percentile = self.getPercentile(
-            type_0_payload_len_list)
-        type_8_payload_len_percentile = self.getPercentile(
-            type_8_payload_len_list)
+        type_0_payload_len_percentile = self.getPercentile(type_0_payload_len_list)
+        type_8_payload_len_percentile = self.getPercentile(type_8_payload_len_list)
 
-        return [
-            type_0_packet_per_IPPair, type_3_packet_per_IPPair,
-            type_8_packet_per_IPPair, src_ip_amount
-        ] + type_0_payload_len_percentile + type_8_payload_len_percentile
+        return [type_0_packet_per_IPPair, type_3_packet_per_IPPair, type_8_packet_per_IPPair, src_ip_amount] + type_0_payload_len_percentile + type_8_payload_len_percentile
 
     def getICMPPayloadLen(self, data):
         ip_packet = data.payload
@@ -106,52 +98,44 @@ class FeatureExtractor():
 
     def extractDistanceFeature(self, ip_pair_datas):
 
-        levenshteinDistanceCalculator = LevenshteinDistanceCalculator()
+        levenshteinDistanceCalculator = LevenshteinDistanceCalculator(ip_pair_datas)
 
-        distance_in_ICMP_pair_list = levenshteinDistanceCalculator.getDistanceInICMPPair(
-            ip_pair_datas)
-        distance_in_ICMP_pair_percentile = self.getPercentile(
-            distance_in_ICMP_pair_list)
-        # print('distance_in_ICMP_pair_list' + str(distance_in_ICMP_pair_list))
+        distance_in_ICMP_pair_list = levenshteinDistanceCalculator.getDistanceInICMPPair()
+        distance_in_ICMP_pair_percentile = self.getPercentile(distance_in_ICMP_pair_list)
+        print('distance_in_ICMP_pair_list' + str(distance_in_ICMP_pair_list))
         # print(len(distance_in_ICMP_pair_list))
         # print(distance_in_ICMP_pair_percentile)
         # print("\n")
 
-        distance_between_type_8_list = levenshteinDistanceCalculator.getDistanceBetweenSameside(
-            ip_pair_datas, 8)
-        distance_between_type_8_percentile = self.getPercentile(
-            distance_between_type_8_list)
-        # print(distance_between_type_8_list)
+        distance_between_type_8_list = levenshteinDistanceCalculator.getDistanceBetweenSameside(8)
+        distance_between_type_8_percentile = self.getPercentile(distance_between_type_8_list)
+        print('distance_between_type_8_list' + str(distance_between_type_8_list))
         # print(len(distance_between_type_8_list))
         # print(distance_between_type_8_percentile)
         # print("\n")
 
-        distance_between_type_0_list = levenshteinDistanceCalculator.getDistanceBetweenSameside(
-            ip_pair_datas, 0)
-        distance_between_type_0_percentile = self.getPercentile(
-            distance_between_type_0_list)
-        # print(distance_between_type_0_list)
+        distance_between_type_0_list = levenshteinDistanceCalculator.getDistanceBetweenSameside(0)
+        distance_between_type_0_percentile = self.getPercentile(distance_between_type_0_list)
+        print('distance_between_type_0_list' + str(distance_between_type_0_list))
         # print(len(distance_between_type_0_list))
         # print(distance_between_type_0_percentile)
         # print("\n")
         return distance_in_ICMP_pair_percentile + distance_between_type_8_percentile + distance_between_type_0_percentile
 
-    def extractFeaturesWithMultiprocess(self, ip_pair_datas, features,
-                                        is_negative_sample):
+    def extractFeaturesWithMultiprocess(self, ip_key, ip_pair_datas, features, is_positive_sample):
 
-        # print(is_negative_sample)  # Value('is_negative_sample', False)
-        # print(is_negative_sample.value)
-        feature_from_payload_len = self.extractFeaturesFromPayloadLen(
-            ip_pair_datas)
+        # print(is_positive_sample)  # Value('is_positive_sample', False)
+        # print(is_positive_sample.value)
+        feature_from_payload_len = self.extractFeaturesFromPayloadLen(ip_pair_datas)
         # print(feature_from_payload_len)
 
         feature_from_distance = self.extractDistanceFeature(ip_pair_datas)
 
-        feature_vec = feature_from_payload_len + feature_from_distance
+        feature_vec = [ip_key] + feature_from_payload_len + feature_from_distance
 
-        if is_negative_sample is True:
+        if is_positive_sample is True:
             feature_vec.append(1)
-        elif is_negative_sample is False:
+        elif is_positive_sample is False:
             feature_vec.append(0)
         features.append(feature_vec)
 
@@ -162,26 +146,25 @@ class FeatureExtractor():
 
         manager = Manager()
 
-        features = manager.list(
-        )  # 主进程与子进程共享该列表， features列表用来保存extractFeaturesWithMultiprocess提取的特征，然后主进程将其写入到csv文件中
+        features = manager.list()  # 主进程与子进程共享该列表， features列表用来保存extractFeaturesWithMultiprocess提取的特征，然后主进程将其写入到csv文件中
 
-        is_negative_sample = False
+        is_positive_sample = False
         ip_pairs_dict = {}
         pcapAnalyzer = PcapAnalyzer(ip_pairs_dict)
 
         pcapAnalyzer.get_filelist(self.pcap_dir)
+        # features = []
 
         for ip_key in ip_pairs_dict.keys():
 
             if (ip_key[0].find('negative') == 0):
-                is_negative_sample = True
+                is_positive_sample = False
             elif (ip_key[0].find('positive') == 0):
-                is_negative_sample = False
+                is_positive_sample = True
 
             ip_pair_datas = ip_pairs_dict.get(ip_key)
             # 异步方式添加到进程池内
-            pool.apply_async(self.extractFeaturesWithMultiprocess,
-                             (ip_pair_datas, features, is_negative_sample))
+            pool.apply_async(self.extractFeaturesWithMultiprocess, (ip_key, ip_pair_datas, features, is_positive_sample))
 
         # 关闭进程池(停止添加，已添加的还可运行)
         pool.close()
@@ -191,13 +174,13 @@ class FeatureExtractor():
         # 单进程
         # for ip_key in ip_pairs_dict.keys():
 
-        #     if(ip_key[0].find('negative') == 0):
-        #         is_negative_sample = True
-        #     elif(ip_key[0].find('positive') == 0):
-        #         is_negative_sample = False
+        #     if (ip_key[0].find('negative') == 0):
+        #         is_positive_sample = False
+        #     elif (ip_key[0].find('positive') == 0):
+        #         is_positive_sample = True
 
         #     ip_pair_datas = ip_pairs_dict.get(ip_key)
-        #     self.extractFeaturesWithMultiprocess(ip_pair_datas, features, is_negative_sample)
+        #     self.extractFeaturesWithMultiprocess(ip_key, ip_pair_datas, features, is_positive_sample)
 
         # 1. 创建文件对象
         f = open(self.output_feature_file, 'a', encoding='utf-8', newline='')
@@ -213,16 +196,8 @@ class FeatureExtractor():
 
     def create_csv_header(self):
         # 3. 构建列表头
-        header_list = [
-            "type_0_packet_per_IPPair", "type_3_packet_per_IPPair",
-            "type_8_packet_per_IPPair", "src_ip_amount"
-        ]
-        auxiliary_list1 = [
-            "type_0_payload_len_percentile", "type_8_payload_len_percentile",
-            "distance_in_ICMP_pair_percentile",
-            "distance_between_type_8_percentile",
-            "distance_between_type_0_percentile"
-        ]
+        header_list = ["ip_key", "type_0_packet_per_IPPair", "type_3_packet_per_IPPair", "type_8_packet_per_IPPair", "src_ip_amount"]
+        auxiliary_list1 = ["type_0_payload_len_percentile", "type_8_payload_len_percentile", "distance_in_ICMP_pair_percentile", "distance_between_type_8_percentile", "distance_between_type_0_percentile"]
         aux_list2 = ["0", "25", "50", "75", "100", "mean"]
         for item1 in auxiliary_list1:
             for item2 in aux_list2:

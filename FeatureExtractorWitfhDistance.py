@@ -8,15 +8,15 @@ from FeatureExtractor import FeatureExtractor
 class FeatureExtractorWitfhDistance(FeatureExtractor):
 
     def extractFeaturesWithMultiprocess(self, ip_pair_datas, features,
-                                        is_negative_sample):
+                                        is_positive_sample):
 
         feature_from_distance = super().extractDistanceFeature(ip_pair_datas)
 
         feature_vec = feature_from_distance
 
-        if is_negative_sample is True:
+        if is_positive_sample is True:
             feature_vec.append(1)
-        elif is_negative_sample is False:
+        elif is_positive_sample is False:
             feature_vec.append(0)
         features.append(feature_vec)
 
