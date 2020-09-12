@@ -1,0 +1,13 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
+edge [fontname=helvetica] ;
+0 [label="distance_between_type_8_percentile_100 <= 34.5\nentropy = 0.995\nsamples = 24\nvalue = [13, 11]\nclass = noICMPTunnel", fillcolor="#fbece1"] ;
+1 [label="entropy = 0.0\nsamples = 12\nvalue = [12, 0]\nclass = noICMPTunnel", fillcolor="#e58139"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="type_0_payload_len_percentile_50 <= 414.5\nentropy = 0.414\nsamples = 12\nvalue = [1, 11]\nclass = hasICMPTunnel", fillcolor="#4ba6e7"] ;
+0 -> 2 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+3 [label="entropy = 0.0\nsamples = 11\nvalue = [0, 11]\nclass = hasICMPTunnel", fillcolor="#399de5"] ;
+2 -> 3 ;
+4 [label="entropy = 0.0\nsamples = 1\nvalue = [1, 0]\nclass = noICMPTunnel", fillcolor="#e58139"] ;
+2 -> 4 ;
+}

@@ -1,17 +1,17 @@
 digraph Tree {
 node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
 edge [fontname=helvetica] ;
-0 [label="distance_in_ICMP_pair_mean <= 1.0\nentropy = 1.0\nsamples = 24\nvalue = [12, 12]\nclass = NoICMPTunnel", fillcolor="#ffffff"] ;
-1 [label="distance_between_type_8_percentile_25 <= 1.5\nentropy = 0.592\nsamples = 14\nvalue = [12, 2]\nclass = NoICMPTunnel", fillcolor="#e9965a"] ;
+0 [label="type_0_packet_per_IPPair <= 0.542\nentropy = 0.998\nsamples = 17\nvalue = [9, 8]\nclass = NoICMPTunnel", fillcolor="#fcf1e9"] ;
+1 [label="type_8_payload_len_percentile_25 <= 2.5\nentropy = 0.544\nsamples = 8\nvalue = [1, 7]\nclass = hasICMPTunnel", fillcolor="#55abe9"] ;
 0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
-2 [label="distance_between_type_0_mean <= 18.345\nentropy = 0.764\nsamples = 9\nvalue = [7, 2]\nclass = NoICMPTunnel", fillcolor="#eca572"] ;
+2 [label="entropy = 0.0\nsamples = 1\nvalue = [1, 0]\nclass = NoICMPTunnel", fillcolor="#e58139"] ;
 1 -> 2 ;
-3 [label="entropy = 0.544\nsamples = 8\nvalue = [7, 1]\nclass = NoICMPTunnel", fillcolor="#e99355"] ;
-2 -> 3 ;
-4 [label="entropy = 0.0\nsamples = 1\nvalue = [0, 1]\nclass = hasICMPTunnel", fillcolor="#399de5"] ;
-2 -> 4 ;
-5 [label="entropy = 0.0\nsamples = 5\nvalue = [5, 0]\nclass = NoICMPTunnel", fillcolor="#e58139"] ;
-1 -> 5 ;
-6 [label="entropy = 0.0\nsamples = 10\nvalue = [0, 10]\nclass = hasICMPTunnel", fillcolor="#399de5"] ;
-0 -> 6 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+3 [label="entropy = 0.0\nsamples = 7\nvalue = [0, 7]\nclass = hasICMPTunnel", fillcolor="#399de5"] ;
+1 -> 3 ;
+4 [label="type_0_payload_len_mean <= 107.003\nentropy = 0.503\nsamples = 9\nvalue = [8, 1]\nclass = NoICMPTunnel", fillcolor="#e89152"] ;
+0 -> 4 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+5 [label="entropy = 0.0\nsamples = 8\nvalue = [8, 0]\nclass = NoICMPTunnel", fillcolor="#e58139"] ;
+4 -> 5 ;
+6 [label="entropy = 0.0\nsamples = 1\nvalue = [0, 1]\nclass = hasICMPTunnel", fillcolor="#399de5"] ;
+4 -> 6 ;
 }
